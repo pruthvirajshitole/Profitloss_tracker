@@ -1,0 +1,175 @@
+{% extends 'transactions/base.html' %}
+
+{% block title %}Dashboard - Profit & Loss Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </h1>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-arrow-up me-2"></i>Total Income</h5>
+            </div>
+            <div class="card-body">
+                <h2 class="profit-amount">₹{{ total_income|floatformat:2 }}</h2>
+                <p class="text-muted mb-0">All time income</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-arrow-down me-2"></i>Total Expenses</h5>
+            </div>
+            <div class="card-body">
+                <h2 class="loss-amount">₹{{ total_expenses|floatformat:2 }}</h2>
+                <p class="text-muted mb-0">All time expenses</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Net Profit/Loss</h5>
+            </div>
+            <div class="card-body">
+                <h2 class="{% if is_profit %}profit-amount{% else %}loss-amount{% endif %}">
+                    ₹{{ net_profit|floatformat:2 }}
+                </h2>
+                <p class="text-muted mb-0">
+                    {% if is_profit %}
+                        <i class="fas fa-arrow-up text-success me-1"></i>Profit
+                    {% else %}
+                        <i class="fas fa-arrow-down text-danger me-1"></i>Loss
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'transactions:add_transaction' %}?type=income" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add Income
+                        </a>
+                        <a href="{% url 'transactions:add_transaction' %}?type=expense" class="btn btn-danger">
+                            <i class="fas fa-minus me-2"></i>Add Expense
+                        </a>
+                        <a href="{% url 'transactions:transaction_list' %}" class="btn btn-info">
+                            <i class="fas fa-list me-2"></i>View All Transactions
+                        </a>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Transactions</h5>
+                <a href="{% url 'transactions:transaction_list' %}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in recent_transactions %}
+                                <tr class="transaction-card">
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ transaction.date|date:"M d, Y" }}<br>
+                                            <span class="text-muted">{{ transaction.date|time:"H:i" }}</span>
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ transaction.description }}</strong>
+                                        {% if transaction.notes %}
+                                            <br><small class="text-muted">{{ transaction.notes|truncatechars:50 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if transaction.is_profit %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-arrow-up me-1"></i>Income
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-arrow-down me-1"></i>Expense
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="{% if transaction.is_profit %}profit-amount{% else %}loss-amount{% endif %}">
+                                            ₹{{ transaction.amount|floatformat:2 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'transactions:edit_transaction' transaction.pk %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'transactions:delete_transaction' transaction.pk %}" 
+                                               class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No transactions yet</h5>
+                        <p class="text-muted">Start by adding your first income or expense transaction.</p>
+                        <div class="btn-group">
+                            <a href="{% url 'transactions:add_transaction' %}?type=income" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>Add First Income
+                            </a>
+                            <a href="{% url 'transactions:add_transaction' %}?type=expense" class="btn btn-danger">
+                                <i class="fas fa-minus me-2"></i>Add First Expense
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

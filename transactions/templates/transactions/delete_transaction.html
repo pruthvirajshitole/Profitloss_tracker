@@ -1,0 +1,64 @@
+{% extends 'transactions/base.html' %}
+
+{% block title %}Delete Transaction - Profit & Loss Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-trash me-2"></i>Delete Transaction
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone.
+                </div>
+                
+                <h6>Transaction Details:</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Description:</strong> {{ transaction.description }}</li>
+                    <li><strong>Amount:</strong> 
+                        <span class="{% if transaction.is_profit %}profit-amount{% else %}loss-amount{% endif %}">
+                            ₹{{ transaction.amount|floatformat:2 }}
+                        </span>
+                    </li>
+                    <li><strong>Type:</strong> 
+                        {% if transaction.is_profit %}
+                            <span class="badge bg-success">Income</span>
+                        {% else %}
+                            <span class="badge bg-danger">Expense</span>
+                        {% endif %}
+                    </li>
+                    <li><strong>Date:</strong> {{ transaction.date|date:"M d, Y H:i" }}</li>
+                    {% if transaction.notes %}
+                        <li><strong>Notes:</strong> {{ transaction.notes }}</li>
+                    {% endif %}
+                </ul>
+                
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Delete Transaction
+                        </button>
+                        <a href="{% url 'transactions:transaction_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

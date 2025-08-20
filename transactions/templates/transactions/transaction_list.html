@@ -1,0 +1,133 @@
+{% extends 'transactions/base.html' %}
+
+{% block title %}All Transactions - Profit & Loss Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-list me-2"></i>All Transactions
+        </h1>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'transactions:transaction_list' %}" class="btn btn-outline-secondary">
+                        All
+                    </a>
+                    <a href="{% url 'transactions:transaction_list' %}?type=income" class="btn btn-outline-success">
+                        <i class="fas fa-arrow-up me-1"></i>Income Only
+                    </a>
+                    <a href="{% url 'transactions:transaction_list' %}?type=expense" class="btn btn-outline-danger">
+                        <i class="fas fa-arrow-down me-1"></i>Expense Only
+                    </a>
+                    <div class="btn-group ms-auto">
+                        <a href="{% url 'transactions:add_transaction' %}?type=income" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Add Income
+                        </a>
+                        <a href="{% url 'transactions:add_transaction' %}?type=expense" class="btn btn-danger">
+                            <i class="fas fa-minus me-2"></i>Add Expense
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-table me-2"></i>Transaction History</h5>
+            </div>
+            <div class="card-body">
+                {% if transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr class="transaction-card">
+                                    <td>
+                                        <small>
+                                            {{ transaction.date|date:"M d, Y" }}<br>
+                                            <span class="text-muted">{{ transaction.date|time:"H:i" }}</span>
+                                        </small>
+                                    </td>
+                                    <td><strong>{{ transaction.description }}</strong></td>
+                                    <td>
+                                        {% if transaction.is_profit %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-arrow-up me-1"></i>Income
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-arrow-down me-1"></i>Expense
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="{% if transaction.is_profit %}profit-amount{% else %}loss-amount{% endif %}">
+                                            ₹{{ transaction.amount|floatformat:2 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if transaction.notes %}
+                                            <small class="text-muted">{{ transaction.notes|truncatechars:50 }}</small>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'transactions:edit_transaction' transaction.pk %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'transactions:delete_transaction' transaction.pk %}" 
+                                               class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No transactions found</h5>
+                        <p class="text-muted">Start by adding your first transaction.</p>
+                        <div class="btn-group">
+                            <a href="{% url 'transactions:add_transaction' %}?type=income" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>Add Income
+                            </a>
+                            <a href="{% url 'transactions:add_transaction' %}?type=expense" class="btn btn-danger">
+                                <i class="fas fa-minus me-2"></i>Add Expense
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
