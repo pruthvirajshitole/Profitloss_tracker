@@ -11,10 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-# Use production settings if available
-if os.environ.get('RAILWAY_ENVIRONMENT'):
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'profit_tracker.production')
-else:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'profit_tracker.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'profit_tracker.settings')
 
 application = get_wsgi_application()

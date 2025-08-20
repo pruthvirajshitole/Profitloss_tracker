@@ -1,6 +1,4 @@
 #!/bin/bash
-# Build script for Railway deployment
-
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
